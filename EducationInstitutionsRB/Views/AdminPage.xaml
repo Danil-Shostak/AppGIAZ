@@ -1,0 +1,19 @@
+<Page
+    x:Class="EducationInstitutionsRB.Views.AdminPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <StackPanel Padding="20" Spacing="15">
+        <TextBlock Text="Администрирование" FontSize="24" FontWeight="Bold"/>
+        <TextBlock Text="Раздел для управления областями, районами и учреждениями"/>
+
+        <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Content="Управление областями"/>
+            <Button Content="Управление районами"/>
+            <Button Content="Управление учреждениями"/>
+        </StackPanel>
+    </StackPanel>
+</Page>
