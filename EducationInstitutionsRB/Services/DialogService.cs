@@ -9,7 +9,7 @@ public class DialogService
 {
     private ContentDialog _currentDialog;
 
-    public async Task<ContentDialogResult> ShowDialogAsync(ContentDialog dialog)
+    public async Task<ContentDialogResult> ShowDialogAsync(ContentDialog dialog, XamlRoot xamlRoot = null)
     {
         // Закрываем предыдущий диалог, если он есть
         if (_currentDialog != null)
@@ -18,6 +18,12 @@ public class DialogService
         }
 
         _currentDialog = dialog;
+
+        // Устанавливаем XamlRoot если передан
+        if (xamlRoot != null)
+        {
+            dialog.XamlRoot = xamlRoot;
+        }
 
         try
         {
@@ -33,33 +39,43 @@ public class DialogService
         }
     }
 
-    public async Task ShowErrorAsync(string message, XamlRoot xamlRoot)
+    public async Task ShowErrorAsync(string message, XamlRoot xamlRoot = null)
     {
         var dialog = new ContentDialog
         {
             Title = "Ошибка",
             Content = message,
-            CloseButtonText = "OK",
-            XamlRoot = xamlRoot
+            CloseButtonText = "OK"
         };
 
-        await ShowDialogAsync(dialog);
+        // Устанавливаем XamlRoot если передан
+        if (xamlRoot != null)
+        {
+            dialog.XamlRoot = xamlRoot;
+        }
+
+        await ShowDialogAsync(dialog, xamlRoot);
     }
 
-    public async Task ShowSuccessAsync(string message, XamlRoot xamlRoot)
+    public async Task ShowSuccessAsync(string message, XamlRoot xamlRoot = null)
     {
         var dialog = new ContentDialog
         {
             Title = "Успех",
             Content = message,
-            CloseButtonText = "OK",
-            XamlRoot = xamlRoot
+            CloseButtonText = "OK"
         };
 
-        await ShowDialogAsync(dialog);
+        // Устанавливаем XamlRoot если передан
+        if (xamlRoot != null)
+        {
+            dialog.XamlRoot = xamlRoot;
+        }
+
+        await ShowDialogAsync(dialog, xamlRoot);
     }
 
-    public async Task<ContentDialogResult> ShowConfirmationAsync(string title, string message, XamlRoot xamlRoot)
+    public async Task<ContentDialogResult> ShowConfirmationAsync(string title, string message, XamlRoot xamlRoot = null)
     {
         var dialog = new ContentDialog
         {
@@ -67,10 +83,15 @@ public class DialogService
             Content = message,
             PrimaryButtonText = "Да",
             CloseButtonText = "Отмена",
-            DefaultButton = ContentDialogButton.Close,
-            XamlRoot = xamlRoot
+            DefaultButton = ContentDialogButton.Close
         };
 
-        return await ShowDialogAsync(dialog);
+        // Устанавливаем XamlRoot если передан
+        if (xamlRoot != null)
+        {
+            dialog.XamlRoot = xamlRoot;
+        }
+
+        return await ShowDialogAsync(dialog, xamlRoot);
     }
 }

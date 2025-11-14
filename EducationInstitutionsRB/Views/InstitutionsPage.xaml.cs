@@ -46,7 +46,15 @@ public sealed partial class InstitutionsPage : Page
         }
         catch (Exception ex)
         {
-            await _dialogService.ShowErrorAsync($"Ошибка загрузки данных: {ex.Message}", this.Content.XamlRoot);
+            // Безопасный вызов с проверкой XamlRoot
+            if (this.Content?.XamlRoot != null)
+            {
+                await _dialogService.ShowErrorAsync($"Ошибка загрузки данных: {ex.Message}", this.Content.XamlRoot);
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine($"Ошибка загрузки данных: {ex.Message}");
+            }
         }
     }
 
@@ -64,7 +72,12 @@ public sealed partial class InstitutionsPage : Page
             };
 
             var dialog = new InstitutionDialog(newInstitution, "Добавить учреждение");
-            dialog.XamlRoot = this.Content.XamlRoot;
+
+            // Безопасная установка XamlRoot
+            if (this.Content?.XamlRoot != null)
+            {
+                dialog.XamlRoot = this.Content.XamlRoot;
+            }
 
             var result = await dialog.ShowAsync();
 
@@ -74,11 +87,19 @@ public sealed partial class InstitutionsPage : Page
                 {
                     await _dataService.AddInstitutionAsync(newInstitution);
                     await LoadDataAsync();
-                    await _dialogService.ShowSuccessAsync("Учреждение успешно добавлено!", this.Content.XamlRoot);
+
+                    // Безопасный вызов с проверкой XamlRoot
+                    if (this.Content?.XamlRoot != null)
+                    {
+                        await _dialogService.ShowSuccessAsync("Учреждение успешно добавлено!", this.Content.XamlRoot);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    await _dialogService.ShowErrorAsync($"Ошибка при добавлении: {ex.Message}", this.Content.XamlRoot);
+                    if (this.Content?.XamlRoot != null)
+                    {
+                        await _dialogService.ShowErrorAsync($"Ошибка при добавлении: {ex.Message}", this.Content.XamlRoot);
+                    }
                 }
             }
         }
@@ -132,7 +153,12 @@ public sealed partial class InstitutionsPage : Page
             };
 
             var dialog = new InstitutionDialog(institutionToEdit, "Редактировать учреждение");
-            dialog.XamlRoot = this.Content.XamlRoot;
+
+            // Безопасная установка XamlRoot
+            if (this.Content?.XamlRoot != null)
+            {
+                dialog.XamlRoot = this.Content.XamlRoot;
+            }
 
             var result = await dialog.ShowAsync();
 
@@ -142,11 +168,19 @@ public sealed partial class InstitutionsPage : Page
                 {
                     await _dataService.UpdateInstitutionAsync(institutionToEdit);
                     await LoadDataAsync();
-                    await _dialogService.ShowSuccessAsync("Учреждение успешно обновлено!", this.Content.XamlRoot);
+
+                    // Безопасный вызов с проверкой XamlRoot
+                    if (this.Content?.XamlRoot != null)
+                    {
+                        await _dialogService.ShowSuccessAsync("Учреждение успешно обновлено!", this.Content.XamlRoot);
+                    }
                 }
                 catch (Exception ex)
                 {
-                    await _dialogService.ShowErrorAsync($"Ошибка при обновлении: {ex.Message}", this.Content.XamlRoot);
+                    if (this.Content?.XamlRoot != null)
+                    {
+                        await _dialogService.ShowErrorAsync($"Ошибка при обновлении: {ex.Message}", this.Content.XamlRoot);
+                    }
                 }
             }
         }
@@ -158,6 +192,9 @@ public sealed partial class InstitutionsPage : Page
 
     private async Task DeleteInstitutionAsync(Institution selectedInstitution)
     {
+        // Безопасный вызов с проверкой XamlRoot
+        if (this.Content?.XamlRoot == null) return;
+
         var result = await _dialogService.ShowConfirmationAsync(
             "Подтверждение удаления",
             $"Вы уверены, что хотите удалить учреждение \"{selectedInstitution.Name}\"?",
@@ -170,6 +207,7 @@ public sealed partial class InstitutionsPage : Page
             {
                 await _dataService.DeleteInstitutionAsync(selectedInstitution.Id);
                 await LoadDataAsync();
+
                 await _dialogService.ShowSuccessAsync("Учреждение успешно удалено!", this.Content.XamlRoot);
             }
             catch (Exception ex)
@@ -179,6 +217,7 @@ public sealed partial class InstitutionsPage : Page
         }
     }
 
+    // Остальные методы без изменений...
     private async void RegionCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (RegionCombo.SelectedItem is Region selectedRegion)
@@ -191,7 +230,11 @@ public sealed partial class InstitutionsPage : Page
             }
             catch (Exception ex)
             {
-                await _dialogService.ShowErrorAsync($"Ошибка загрузки районов: {ex.Message}", this.Content.XamlRoot);
+                // Безопасный вызов с проверкой XamlRoot
+                if (this.Content?.XamlRoot != null)
+                {
+                    await _dialogService.ShowErrorAsync($"Ошибка загрузки районов: {ex.Message}", this.Content.XamlRoot);
+                }
             }
         }
         else

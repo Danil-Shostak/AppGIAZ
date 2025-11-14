@@ -16,70 +16,65 @@
         <converters:DateTimeToDateTimeOffsetConverter x:Key="DateTimeToDateTimeOffsetConverter"/>
     </ContentDialog.Resources>
 
-    <!-- Скролл у края, без отступов -->
-    <ScrollViewer MaxHeight="500" VerticalScrollBarVisibility="Auto"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  Padding="16"
-                  Margin="16">
-        <!-- Контент с отступами только справа для скролла -->
-        <StackPanel Spacing="16" Padding="0, 0, 16, 0" HorizontalAlignment="Stretch"
-                    Margin="0">
+    <ScrollViewer MaxHeight="500" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="16" Padding="0,0,8,0">
             <TextBlock Text="Поля, отмеченные *, обязательны для заполнения" 
-                       FontStyle="Italic" Foreground="Gray" FontSize="12"
-                       />
+                       FontStyle="Italic" Foreground="Gray" FontSize="12"/>
 
             <!-- Основная информация -->
             <TextBox Header="Название *" 
                      Text="{x:Bind Institution.Name, Mode=TwoWay}"
                      PlaceholderText="Введите название учреждения"
-                     HorizontalAlignment="Stretch"
-                     Margin="16,0,0,0"/>
+                     HorizontalAlignment="Stretch"/>
 
             <ComboBox Header="Тип *" 
                       ItemsSource="{x:Bind InstitutionTypes}" 
                       SelectedItem="{x:Bind Institution.Type, Mode=TwoWay}"
                       PlaceholderText="Выберите тип учреждения"
-                      HorizontalAlignment="Stretch"
-                      Margin="16,0,0,0"/>
+                      HorizontalAlignment="Stretch"/>
 
             <TextBox Header="Адрес *" 
                      Text="{x:Bind Institution.Address, Mode=TwoWay}"
                      PlaceholderText="Введите адрес учреждения"
-                     HorizontalAlignment="Stretch"
-                     Margin="16,0,0,0"/>
+                     HorizontalAlignment="Stretch"/>
 
             <TextBox Header="Контакты" 
                      Text="{x:Bind Institution.Contacts, Mode=TwoWay}"
                      PlaceholderText="Введите контактную информацию"
-                     HorizontalAlignment="Stretch"
-                     Margin="16,0,0,0"/>
+                     HorizontalAlignment="Stretch"/>
 
-            <!-- Регион и район -->
+            <!-- Регион и район с автодополнением -->
             <ComboBox Header="Область *" 
                       x:Name="RegionCombo"
                       DisplayMemberPath="Name"
                       SelectedValuePath="Id"
                       SelectionChanged="RegionCombo_SelectionChanged"
                       PlaceholderText="Выберите область"
-                      HorizontalAlignment="Stretch"
-                      Margin="16,0,0,0"/>
+                      HorizontalAlignment="Stretch"/>
 
-            <ComboBox Header="Район *" 
-                      x:Name="DistrictCombo"
-                      DisplayMemberPath="Name"
-                      SelectedValuePath="Id"
-                      SelectionChanged="DistrictCombo_SelectionChanged"
-                      PlaceholderText="Сначала выберите область"
-                      IsEnabled="False"
-                      HorizontalAlignment="Stretch"
-                      Margin="16,0,0,0"/>
+            <AutoSuggestBox Header="Район *" 
+                            x:Name="DistrictSuggestBox"
+                            PlaceholderText="Начните вводить название района"
+                            Text="{x:Bind DistrictSearchText, Mode=TwoWay}"
+                            QueryIcon="Find"
+                            TextChanged="DistrictSuggestBox_TextChanged"
+                            SuggestionChosen="DistrictSuggestBox_SuggestionChosen"
+                            QuerySubmitted="DistrictSuggestBox_QuerySubmitted"
+                            HorizontalAlignment="Stretch">
+                <AutoSuggestBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Padding="8">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding Region.Name}" FontSize="12" Foreground="Gray"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </AutoSuggestBox.ItemTemplate>
+            </AutoSuggestBox>
 
             <!-- Статистика -->
-            <TextBlock Text="Статистика" FontWeight="SemiBold" FontSize="14"
-                       Margin="16,0,0,0"/>
+            <TextBlock Text="Статистика" FontWeight="SemiBold" FontSize="14"/>
 
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="16,0,0,0">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <TextBox Grid.Column="0" 
                          Header="Количество учащихся" 
                          Text="{x:Bind Institution.StudentCount, Mode=TwoWay}"
@@ -92,7 +87,7 @@
                          HorizontalAlignment="Stretch"/>
             </Grid>
 
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="16,0,0,0">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <TextBox Grid.Column="0" 
                          Header="Принято учащихся" 
                          Text="{x:Bind Institution.AdmittedCount, Mode=TwoWay}"
@@ -106,7 +101,7 @@
             </Grid>
 
             <!-- Статус и дата -->
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="16,0,0,0">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <ComboBox Grid.Column="0" 
                           Header="Статус" 
                           ItemsSource="{x:Bind StatusTypes}" 
