@@ -23,17 +23,20 @@
             <TextBlock Text="Поиск учреждений" FontSize="18" FontWeight="Bold"/>
             <TextBox PlaceholderText="Поиск по названию..." x:Name="SearchTextBox" TextChanged="SearchTextBox_TextChanged"/>
 
-            <StackPanel Orientation="Horizontal" Spacing="10">
+            <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Bottom">
                 <ComboBox Header="Область" Width="200" x:Name="RegionCombo"
                           DisplayMemberPath="Name"
-                          SelectionChanged="RegionCombo_SelectionChanged"/>
+                          SelectionChanged="RegionCombo_SelectionChanged"
+                          VerticalAlignment="Bottom"/>
 
                 <ComboBox Header="Район" Width="200" x:Name="DistrictCombo"
                           DisplayMemberPath="Name"
-                          SelectionChanged="DistrictCombo_SelectionChanged"/>
+                          SelectionChanged="DistrictCombo_SelectionChanged"
+                          VerticalAlignment="Bottom"/>
 
                 <ComboBox Header="Тип" Width="150" x:Name="TypeCombo"
-                          SelectionChanged="TypeCombo_SelectionChanged">
+                          SelectionChanged="TypeCombo_SelectionChanged"
+                          VerticalAlignment="Bottom">
                     <x:String>Школа</x:String>
                     <x:String>Гимназия</x:String>
                     <x:String>Лицей</x:String>
@@ -42,7 +45,10 @@
                 </ComboBox>
 
                 <Button Content="➕ Добавить учреждение" Click="AddInstitutionButton_Click"
-                        Background="#0078D4" Foreground="White" Padding="12,8"/>
+                        Background="#0078D4" Foreground="White" Padding="5"
+                        VerticalAlignment="Bottom"
+                        Height="32"
+                        FontSize="15"/>
             </StackPanel>
         </StackPanel>
 
