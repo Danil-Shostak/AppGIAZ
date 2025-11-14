@@ -4,12 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="20">
+        <!-- Скрытая панель для перетаскивания -->
+        <Grid x:Name="HiddenTitleBar" 
+              Height="1" 
+              VerticalAlignment="Top"
+              Background="Transparent"/>
 
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="24">
             <!-- Иконка в стиле приложения -->
             <Border Width="120" Height="120" 
                     Background="{ThemeResource SystemControlBackgroundAccentBrush}"
-                    CornerRadius="12"
+                    CornerRadius="16"
                     HorizontalAlignment="Center">
                 <Viewbox Width="60" Height="60">
                     <FontIcon Glyph="&#xE8F1;" Foreground="White"/>
@@ -17,31 +22,31 @@
             </Border>
 
             <!-- Текст -->
-            <TextBlock Text="Образовательные учреждения РБ" 
-                      FontSize="28" 
-                      FontWeight="SemiBold"
-                      HorizontalAlignment="Center"
-                      Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                      TextAlignment="Center"/>
-            
-            <TextBlock Text="Версия: 1.0" 
-                        FontSize="14" 
-                        FontWeight="SemiBold"
-                        HorizontalAlignment="Center"
-                        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                        TextAlignment="Center"/>
+            <StackPanel>
+                <TextBlock Text="Образовательные учреждения РБ" 
+                          FontSize="28" 
+                          FontWeight="SemiBold"
+                          HorizontalAlignment="Center"
+                          Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                          TextAlignment="Center"/>
+                <TextBlock Text="Версия: 1.0" 
+                            FontSize="28" 
+                            FontWeight="SemiBold"
+                            HorizontalAlignment="Center"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            TextAlignment="Center"/>
 
-            <TextBlock Text="Загрузка..." 
-                      FontSize="16" 
-                      Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                      HorizontalAlignment="Center"
-                      Margin="0,8,0,0"/>
+                <TextBlock Text="Загрузка..." 
+                          FontSize="16" 
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          HorizontalAlignment="Center"
+                          Margin="0,12,0,0"/>
+            </StackPanel>
 
             <!-- Прогресс-бар -->
             <ProgressRing Width="48" Height="48"
                          IsActive="True"
                          HorizontalAlignment="Center"
-                         Margin="0,16,0,0"
                          Foreground="{ThemeResource SystemControlForegroundAccentBrush}"/>
         </StackPanel>
     </Grid>

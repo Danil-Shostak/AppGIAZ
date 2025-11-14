@@ -10,88 +10,79 @@ namespace EducationInstitutionsRB;
 
 public sealed partial class SplashWindow : Window
 {
-    private readonly Stopwatch _stopwatch = new Stopwatch();
-    private bool _isInitialized = false;
+    private bool _isTitleBarSetup = false;
 
     public SplashWindow()
     {
         try
         {
             this.InitializeComponent();
-            _stopwatch.Start();
 
             // Подписываемся на событие Activated
             this.Activated += SplashWindow_Activated;
 
-            Debug.WriteLine("SplashWindow: Конструктор завершен");
+            // Сразу запускаем переход
+            _ = StartTransitionImmediately();
+
+            Debug.WriteLine("SplashWindow: Запущен");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"SplashWindow: Ошибка в конструкторе: {ex.Message}");
+            Debug.WriteLine($"SplashWindow: Ошибка: {ex.Message}");
+            ShowMainWindow();
         }
     }
 
     private void SplashWindow_Activated(object sender, WindowActivatedEventArgs args)
     {
-        // Защита от повторного выполнения
-        if (_isInitialized) return;
-        _isInitialized = true;
-
-        Debug.WriteLine("SplashWindow: Activated событие вызвано");
-
-        // Отписываемся от события
-        this.Activated -= SplashWindow_Activated;
-
-        // Разворачиваем на весь экран
-        SetupFullScreen();
-
-        // Запускаем таймер перехода
-        _ = StartTransitionTimer();
+        // Настраиваем title bar только один раз
+        if (!_isTitleBarSetup)
+        {
+            _isTitleBarSetup = true;
+            SetupCustomTitleBar();
+        }
     }
 
-    private void SetupFullScreen()
+    private void SetupCustomTitleBar()
     {
         try
         {
+            this.ExtendsContentIntoTitleBar = true;
+            this.SetTitleBar(HiddenTitleBar);
+
             IntPtr hWnd = WindowNative.GetWindowHandle(this);
             WindowId windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-            AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
+            var appWindow = AppWindow.GetFromWindowId(windowId);
 
             if (appWindow.Presenter is OverlappedPresenter presenter)
             {
+                presenter.SetBorderAndTitleBar(false, false);
                 presenter.Maximize();
-                Debug.WriteLine("SplashWindow: Окно развернуто на полный экран");
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"SplashWindow: Ошибка разворачивания: {ex.Message}");
+            Debug.WriteLine($"SplashWindow: Ошибка title bar: {ex.Message}");
         }
     }
 
-    private async Task StartTransitionTimer()
+    private async Task StartTransitionImmediately()
     {
         try
         {
-            Debug.WriteLine("SplashWindow: Таймер запущен");
+            Debug.WriteLine("SplashWindow: Начало перехода");
 
-            // Ждем всего 800 миллисекунд
+            // Короткая задержка - 200ms
             await Task.Delay(2000);
 
-            Debug.WriteLine($"SplashWindow: Таймер завершен. Прошло времени: {_stopwatch.ElapsedMilliseconds}ms");
+            Debug.WriteLine("SplashWindow: Создание главного окна");
 
-            // Переходим на главное окно
             ShowMainWindow();
-
-            // Закрываем сплеш-окно
             this.Close();
-
-            Debug.WriteLine("SplashWindow: Окно закрыто");
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"SplashWindow: Ошибка в таймере: {ex.Message}");
-            // В случае ошибки все равно пытаемся открыть главное окно
+            Debug.WriteLine($"SplashWindow: Ошибка перехода: {ex.Message}");
             ShowMainWindow();
         }
     }
@@ -100,12 +91,11 @@ public sealed partial class SplashWindow : Window
     {
         try
         {
-            Debug.WriteLine("SplashWindow: Создание главного окна...");
-
             var mainWindow = new MainWindow();
             mainWindow.Activate();
 
-            Debug.WriteLine("SplashWindow: Главное окно активировано");
+            // Устанавливаем главное окно в App
+            App.SetMainWindow(mainWindow);
         }
         catch (Exception ex)
         {

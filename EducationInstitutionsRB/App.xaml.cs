@@ -3,6 +3,7 @@ using EducationInstitutionsRB.Views;
 using Microsoft.UI.Xaml;
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace EducationInstitutionsRB;
 
@@ -20,11 +21,19 @@ public partial class App : Application
 
         Debug.WriteLine("=== ПРИЛОЖЕНИЕ ЗАПУЩЕНО ===");
 
+        // Инициализируем сервисы в фоне
+        _ = InitializeServicesAsync();
+    }
+
+    private async Task InitializeServicesAsync()
+    {
         try
         {
+            // Инициализируем сервисы асинхронно
             _dataService = new DataService();
             _dialogService = new DialogService();
-            Debug.WriteLine("Сервисы инициализированы успешно");
+
+            Debug.WriteLine("Сервисы инициализированы в фоне");
         }
         catch (Exception ex)
         {
@@ -36,19 +45,16 @@ public partial class App : Application
     {
         try
         {
-            Debug.WriteLine("OnLaunched начат");
+            Debug.WriteLine("OnLaunched: Показываем сплеш-скрин");
 
-            // Создаем и показываем окно сплеш-скрина
+            // Сразу показываем сплеш-скрин
             var splashWindow = new SplashWindow();
             splashWindow.Activate();
-
-            Debug.WriteLine("Сплеш-окно создано и активировано");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Ошибка в OnLaunched: {ex.Message}");
-
-            // Если сплеш-окно не работает, создаем главное окно напрямую
+            // Если сплеш не работает, создаем главное окно напрямую
             CreateMainWindowDirectly();
         }
     }
@@ -59,7 +65,6 @@ public partial class App : Application
         {
             _mainWindow = new MainWindow();
             _mainWindow.Activate();
-            Debug.WriteLine("Главное окно создано напрямую");
         }
         catch (Exception ex)
         {
@@ -69,8 +74,7 @@ public partial class App : Application
 
     private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
     {
-        Debug.WriteLine($"=== НЕПЕРЕХВАЧЕННОЕ ИСКЛЮЧЕНИЕ ===");
-        Debug.WriteLine($"Сообщение: {e.Message}");
+        Debug.WriteLine($"Необработанное исключение: {e.Message}");
         e.Handled = true;
     }
 
@@ -81,5 +85,11 @@ public partial class App : Application
         if (typeof(T) == typeof(DialogService) && _dialogService is T dialogService)
             return dialogService;
         throw new InvalidOperationException($"Service {typeof(T)} not registered");
+    }
+
+    // Метод для установки главного окна (вызывается из SplashWindow)
+    public static void SetMainWindow(Window window)
+    {
+        _mainWindow = window;
     }
 }

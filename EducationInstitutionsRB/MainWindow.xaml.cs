@@ -1,63 +1,170 @@
-using EducationInstitutionsRB.Views;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Navigation;
 using System;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using WinRT.Interop;
 
 namespace EducationInstitutionsRB;
 
 public sealed partial class MainWindow : Window
 {
+    private AppWindow _appWindow;
+    private bool _isInitialized = false;
+
     public MainWindow()
     {
-        this.InitializeComponent();
-        this.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
-
-        // Разворачиваем на весь экран
-        IntPtr hWnd = WindowNative.GetWindowHandle(this);
-        WindowId windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
-        AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
-
-        if (appWindow.Presenter is OverlappedPresenter presenter)
+        try
         {
-            presenter.Maximize();
+            this.InitializeComponent();
+
+            // Подписываемся на событие Activated
+            this.Activated += MainWindow_Activated;
+
+            // Быстрая базовая настройка
+            SetupBasicWindow();
+
+            Debug.WriteLine("MainWindow: Конструктор завершен");
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"MainWindow: Ошибка в конструкторе: {ex.Message}");
+        }
+    }
+
+    private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
+    {
+        if (_isInitialized) return;
+        _isInitialized = true;
+
+        // Отписываемся от события
+        this.Activated -= MainWindow_Activated;
+
+        Debug.WriteLine("MainWindow: Activated - завершаем настройку");
+
+        // Завершаем настройку после показа окна
+        CompleteWindowSetup();
+    }
+
+    private void SetupBasicWindow()
+    {
+        try
+        {
+            // Минимальная настройка для быстрого показа
+            this.ExtendsContentIntoTitleBar = true;
+            this.SetTitleBar(DragRegion);
+
+            // Получаем AppWindow
+            IntPtr hWnd = WindowNative.GetWindowHandle(this);
+            WindowId windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
+            _appWindow = AppWindow.GetFromWindowId(windowId);
+
+            // Сразу разворачиваем и скрываем стандартный title bar
+            if (_appWindow.Presenter is OverlappedPresenter presenter)
+            {
+                presenter.SetBorderAndTitleBar(false, false);
+                presenter.Maximize();
+            }
+
+            Debug.WriteLine("MainWindow: Базовая настройка завершена");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"MainWindow: Ошибка базовой настройки: {ex.Message}");
+        }
+    }
+
+    private void CompleteWindowSetup()
+    {
+        try
+        {
+            // Устанавливаем фон асинхронно (может быть медленным)
+            _ = Task.Run(async () =>
+            {
+                await Task.Delay(100); // Небольшая задержка чтобы не мешать показу окна
+
+                _ = this.DispatcherQueue.TryEnqueue(() =>
+                {
+                    try
+                    {
+                        this.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+                        Debug.WriteLine("MainWindow: Mica backdrop установлен");
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            this.SystemBackdrop = new Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop();
+                            Debug.WriteLine("MainWindow: Acrylic backdrop установлен");
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine($"MainWindow: Ошибка установки backdrop: {ex.Message}");
+                        }
+                    }
+                });
+            });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"MainWindow: Ошибка завершения настройки: {ex.Message}");
+        }
+    }
+
+    // Обработчики кнопок управления окном
+    private void MinimizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Minimize();
+        }
+    }
+
+    private void MaximizeButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            if (presenter.State == OverlappedPresenterState.Maximized)
+            {
+                presenter.Restore();
+                MaximizeButton.Content = "&#xE922;";
+            }
+            else
+            {
+                presenter.Maximize();
+                MaximizeButton.Content = "&#xE923;";
+            }
+        }
+    }
+
+    private void CloseButton_Click(object sender, RoutedEventArgs e)
+    {
+        this.Close();
     }
 
     private void RootNavigation_Loaded(object sender, RoutedEventArgs e)
     {
-        // Устанавливаем начальную страницу с анимацией
-        ContentFrame.Navigate(typeof(OverviewPage), null, new EntranceNavigationTransitionInfo());
+        ContentFrame.Navigate(typeof(Views.OverviewPage));
         RootNavigation.SelectedItem = RootNavigation.MenuItems[0];
     }
 
-    // Остальной код без изменений...
     private void RootNavigation_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.InvokedItemContainer is NavigationViewItem item)
         {
-            switch (item.Tag.ToString())
+            var pageType = item.Tag?.ToString() switch
             {
-                case "Overview":
-                    ContentFrame.Navigate(typeof(OverviewPage), null, new DrillInNavigationTransitionInfo());
-                    break;
-                case "Institutions":
-                    ContentFrame.Navigate(typeof(InstitutionsPage), null, new DrillInNavigationTransitionInfo());
-                    break;
-                case "Import":
-                    ContentFrame.Navigate(typeof(ImportPage), null, new DrillInNavigationTransitionInfo());
-                    break;
-                case "Reports":
-                    ContentFrame.Navigate(typeof(ReportsPage), null, new DrillInNavigationTransitionInfo());
-                    break;
-                case "Admin":
-                    ContentFrame.Navigate(typeof(AdminPage), null, new DrillInNavigationTransitionInfo());
-                    break;
-            }
+                "Overview" => typeof(Views.OverviewPage),
+                "Institutions" => typeof(Views.InstitutionsPage),
+                "Import" => typeof(Views.ImportPage),
+                "Reports" => typeof(Views.ReportsPage),
+                "Admin" => typeof(Views.AdminPage),
+                _ => typeof(Views.OverviewPage)
+            };
+
+            ContentFrame.Navigate(pageType);
         }
     }
 

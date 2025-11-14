@@ -11,7 +11,7 @@
     DefaultButton="Primary"
     mc:Ignorable="d">
 
-    <ScrollViewer MaxHeight="400" VerticalScrollBarVisibility="Auto">
+    <ScrollViewer MaxHeight="600" VerticalScrollBarVisibility="Auto">
         <StackPanel Spacing="16" Padding="0,0,8,0">
             <TextBlock Text="Поля, отмеченные *, обязательны для заполнения" 
                        FontStyle="Italic" Foreground="Gray" FontSize="12"/>
