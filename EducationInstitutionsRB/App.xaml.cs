@@ -29,10 +29,8 @@ public partial class App : Application
     {
         try
         {
-            // Инициализируем сервисы асинхронно
             _dataService = new DataService();
             _dialogService = new DialogService();
-
             Debug.WriteLine("Сервисы инициализированы в фоне");
         }
         catch (Exception ex)
@@ -45,30 +43,17 @@ public partial class App : Application
     {
         try
         {
-            Debug.WriteLine("OnLaunched: Показываем сплеш-скрин");
+            Debug.WriteLine("OnLaunched: Создаем главное окно");
 
-            // Сразу показываем сплеш-скрин
-            var splashWindow = new SplashWindow();
-            splashWindow.Activate();
+            // Создаем ОДНО главное окно
+            _mainWindow = new MainWindow();
+            _mainWindow.Activate();
+
+            Debug.WriteLine("Главное окно создано и активировано");
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"Ошибка в OnLaunched: {ex.Message}");
-            // Если сплеш не работает, создаем главное окно напрямую
-            CreateMainWindowDirectly();
-        }
-    }
-
-    private void CreateMainWindowDirectly()
-    {
-        try
-        {
-            _mainWindow = new MainWindow();
-            _mainWindow.Activate();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Ошибка создания главного окна: {ex.Message}");
         }
     }
 
@@ -85,11 +70,5 @@ public partial class App : Application
         if (typeof(T) == typeof(DialogService) && _dialogService is T dialogService)
             return dialogService;
         throw new InvalidOperationException($"Service {typeof(T)} not registered");
-    }
-
-    // Метод для установки главного окна (вызывается из SplashWindow)
-    public static void SetMainWindow(Window window)
-    {
-        _mainWindow = window;
     }
 }
