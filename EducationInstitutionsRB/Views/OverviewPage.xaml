@@ -98,7 +98,9 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- Кнопка добавления учреждения -->
                     <Button Grid.Column="0" Content="➕ Добавить учреждение" 
+                            x:Name="AddInstitutionButton"
                             Click="AddInstitutionButton_Click"
                             HorizontalAlignment="Stretch"
                             Background="{ThemeResource SystemControlBackgroundAccentBrush}"
@@ -108,6 +110,7 @@
                             Padding="12,8"/>
 
                     <Button Grid.Column="1" Content="📊 Создать отчет" 
+                            x:Name="GenerateReportButton"
                             Click="GenerateReportButton_Click"
                             HorizontalAlignment="Stretch"
                             Background="{ThemeResource SystemControlBackgroundAccentBrush}"

@@ -53,10 +53,20 @@
         </StackPanel>
 
         <!-- Список учреждений -->
+        <!-- EducationInstitutionsRB/Views/InstitutionsPage.xaml - ОБНОВЛЯЕМ ListView -->
         <ListView
-            Grid.Row="1"
-            x:Name="InstitutionsList"
-            SelectionMode="None">
+    Grid.Row="1"
+    x:Name="InstitutionsList"
+    SelectionMode="Single"
+    IsItemClickEnabled="True"
+    ItemClick="InstitutionsList_ItemClick">
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <Border BorderBrush="#E1E1E1" BorderThickness="0,0,0,1" Padding="0,8">
@@ -68,15 +78,19 @@
                                 <TextBlock Text="{Binding Address}" FontSize="12"/>
                                 <TextBlock Text="{Binding District.Region.Name}" FontSize="11" Foreground="DarkGray"/>
 
-                                <!-- Статистика с использованием конвертеров -->
+                                <!-- Расширенная информация в списке -->
                                 <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,4,0,0">
                                     <TextBlock FontSize="11" Foreground="#0078D4">
-                                        <Run Text="Учеников: "/>
-                                        <Run Text="{Binding StudentCount}"/>
+                                <Run Text="Учеников: "/>
+                                <Run Text="{Binding StudentCount}"/>
                                     </TextBlock>
                                     <TextBlock FontSize="11" Foreground="#0078D4">
-                                        <Run Text="Персонал: "/>
-                                        <Run Text="{Binding StaffCount}"/>
+                                <Run Text="Педагогов: "/>
+                                <Run Text="{Binding TeacherCount}"/>
+                                    </TextBlock>
+                                    <TextBlock FontSize="11" Foreground="#0078D4">
+                                <Run Text="Категория: "/>
+                                <Run Text="{Binding AccreditationCategory}"/>
                                     </TextBlock>
                                 </StackPanel>
                             </StackPanel>
@@ -84,17 +98,17 @@
                             <!-- Кнопки действий -->
                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
                                 <Button Content="✏️" Click="EditButton_Click" 
-                                        Tag="{Binding}"
-                                        ToolTipService.ToolTip="Редактировать"
-                                        Background="Transparent" BorderThickness="0"
-                                        Padding="8,4" FontSize="12"/>
+                                Tag="{Binding}"
+                                ToolTipService.ToolTip="Редактировать"
+                                Background="Transparent" BorderThickness="0"
+                                Padding="8,4" FontSize="12"/>
 
                                 <Button Content="🗑️" Click="DeleteButton_Click" 
-                                        Tag="{Binding}"
-                                        ToolTipService.ToolTip="Удалить"
-                                        Background="Transparent" BorderThickness="0"
-                                        Padding="8,4" FontSize="12"
-                                        Foreground="#D13438"/>
+                                Tag="{Binding}"
+                                ToolTipService.ToolTip="Удалить"
+                                Background="Transparent" BorderThickness="0"
+                                Padding="8,4" FontSize="12"
+                                Foreground="#D13438"/>
                             </StackPanel>
                         </Grid>
                     </Border>

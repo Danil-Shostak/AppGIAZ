@@ -2,9 +2,13 @@ using EducationInstitutionsRB.Models;
 using EducationInstitutionsRB.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,6 +34,18 @@ public sealed partial class InstitutionsPage : Page
     {
         base.OnNavigatedTo(e);
         await LoadDataAsync();
+    }
+
+    private void InstitutionsList_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is Institution institution)
+        {
+            Debug.WriteLine($"Нажато учреждение: {institution.Name} (ID: {institution.Id})");
+
+            // Переход на детальную страницу с передачей ID
+            Frame.Navigate(typeof(InstitutionDetailPage), institution.Id,
+                new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });
+        }
     }
 
     private async Task LoadDataAsync()
@@ -68,12 +84,15 @@ public sealed partial class InstitutionsPage : Page
             var newInstitution = new Institution
             {
                 RegistrationDate = DateTime.Now,
-                Status = "Активно"
+                Status = "Активно",
+                InstitutionStatus = "Действующее",
+                OwnershipType = "Государственное",
+                LanguageOfEducation = "Русский",
+                FoundationYear = DateTime.Now.Year
             };
 
-            var dialog = new InstitutionDialog(newInstitution, "Добавить учреждение");
+            var dialog = new ExtendedInstitutionDialog(newInstitution, "Добавить учреждение");
 
-            // Безопасная установка XamlRoot
             if (this.Content?.XamlRoot != null)
             {
                 dialog.XamlRoot = this.Content.XamlRoot;
@@ -88,7 +107,6 @@ public sealed partial class InstitutionsPage : Page
                     await _dataService.AddInstitutionAsync(newInstitution);
                     await LoadDataAsync();
 
-                    // Безопасный вызов с проверкой XamlRoot
                     if (this.Content?.XamlRoot != null)
                     {
                         await _dialogService.ShowSuccessAsync("Учреждение успешно добавлено!", this.Content.XamlRoot);
@@ -135,26 +153,49 @@ public sealed partial class InstitutionsPage : Page
 
         try
         {
+            // Создаем копию с ВСЕМИ полями
             var institutionToEdit = new Institution
             {
+                // Старые поля
                 Id = selectedInstitution.Id,
                 Name = selectedInstitution.Name,
                 Type = selectedInstitution.Type,
                 Address = selectedInstitution.Address,
                 Contacts = selectedInstitution.Contacts,
                 DistrictId = selectedInstitution.DistrictId,
-                District = selectedInstitution.District,
                 Status = selectedInstitution.Status,
                 RegistrationDate = selectedInstitution.RegistrationDate,
                 StudentCount = selectedInstitution.StudentCount,
                 AdmittedCount = selectedInstitution.AdmittedCount,
                 ExpelledCount = selectedInstitution.ExpelledCount,
-                StaffCount = selectedInstitution.StaffCount
+                StaffCount = selectedInstitution.StaffCount,
+
+                // Новые поля
+                LicenseNumber = selectedInstitution.LicenseNumber,
+                LicenseExpiryDate = selectedInstitution.LicenseExpiryDate,
+                AccreditationCategory = selectedInstitution.AccreditationCategory,
+                OwnershipType = selectedInstitution.OwnershipType,
+                LanguageOfEducation = selectedInstitution.LanguageOfEducation,
+                DirectorName = selectedInstitution.DirectorName,
+                Email = selectedInstitution.Email,
+                Website = selectedInstitution.Website,
+                FoundationYear = selectedInstitution.FoundationYear,
+                InstitutionStatus = selectedInstitution.InstitutionStatus,
+                ClassroomCount = selectedInstitution.ClassroomCount,
+                TeacherCount = selectedInstitution.TeacherCount,
+                AdministrativeStaffCount = selectedInstitution.AdministrativeStaffCount,
+                ComputerCount = selectedInstitution.ComputerCount,
+                HasSportsHall = selectedInstitution.HasSportsHall,
+                HasDiningRoom = selectedInstitution.HasDiningRoom,
+                HasLibrary = selectedInstitution.HasLibrary,
+                TotalArea = selectedInstitution.TotalArea,
+                Specialization = selectedInstitution.Specialization,
+                EducationalPrograms = selectedInstitution.EducationalPrograms,
+                Infrastructure = selectedInstitution.Infrastructure
             };
 
-            var dialog = new InstitutionDialog(institutionToEdit, "Редактировать учреждение");
+            var dialog = new ExtendedInstitutionDialog(institutionToEdit, "Редактировать учреждение");
 
-            // Безопасная установка XamlRoot
             if (this.Content?.XamlRoot != null)
             {
                 dialog.XamlRoot = this.Content.XamlRoot;
@@ -169,7 +210,6 @@ public sealed partial class InstitutionsPage : Page
                     await _dataService.UpdateInstitutionAsync(institutionToEdit);
                     await LoadDataAsync();
 
-                    // Безопасный вызов с проверкой XamlRoot
                     if (this.Content?.XamlRoot != null)
                     {
                         await _dialogService.ShowSuccessAsync("Учреждение успешно обновлено!", this.Content.XamlRoot);

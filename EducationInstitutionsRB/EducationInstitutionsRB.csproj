@@ -60,6 +60,9 @@
     <Page Update="Views\DistrictDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\ExtendedInstitutionDialog.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\SplashPage.xaml">
       <SubType>Designer</SubType>
     </Page>

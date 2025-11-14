@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -15,7 +16,23 @@ public class DataService : IDataService
     {
         _context = new AppDbContext();
         _context.InitializeDatabase();
+
+        // Добавляем миграцию
+        _ = MigrateDatabaseAsync();
         InitializeSampleData();
+    }
+
+    private async Task MigrateDatabaseAsync()
+    {
+        try
+        {
+            await _context.MigrateDatabaseAsync();
+            Debug.WriteLine("Database migration completed");
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Database migration error: {ex.Message}");
+        }
     }
 
     private async void InitializeSampleData()
@@ -55,7 +72,22 @@ public class DataService : IDataService
                     StudentCount = 850,
                     AdmittedCount = 120,
                     ExpelledCount = 15,
-                    StaffCount = 65
+                    StaffCount = 65,
+                    // ДОБАВЛЯЕМ НОВЫЕ ПОЛЯ
+                    TeacherCount = 45, // Преподаватели
+                    AdministrativeStaffCount = 20, // Административный персонал
+                    ClassroomCount = 30,
+                    ComputerCount = 50,
+                    HasSportsHall = true,
+                    HasDiningRoom = true,
+                    HasLibrary = true,
+                    TotalArea = 2500.5m,
+                    LicenseNumber = "12345-Л",
+                    DirectorName = "Иванова Мария Петровна",
+                    Email = "gym1@edu.by",
+                    Website = "https://gym1.edu.by",
+                    FoundationYear = 1990,
+                    AccreditationCategory = "I категория"
                 };
 
                 var institution2 = new Institution
@@ -70,13 +102,28 @@ public class DataService : IDataService
                     StudentCount = 620,
                     AdmittedCount = 85,
                     ExpelledCount = 8,
-                    StaffCount = 45
+                    StaffCount = 45,
+                    // ДОБАВЛЯЕМ НОВЫЕ ПОЛЯ
+                    TeacherCount = 38, // Преподаватели
+                    AdministrativeStaffCount = 7, // Административный персонал
+                    ClassroomCount = 25,
+                    ComputerCount = 35,
+                    HasSportsHall = true,
+                    HasDiningRoom = false,
+                    HasLibrary = true,
+                    TotalArea = 1800.0m,
+                    LicenseNumber = "67890-Л",
+                    DirectorName = "Петров Алексей Иванович",
+                    Email = "school2@grodno.by",
+                    Website = "https://school2.edu.by",
+                    FoundationYear = 1985,
+                    AccreditationCategory = "II категория"
                 };
 
                 _context.Institutions.AddRange(institution1, institution2);
                 await _context.SaveChangesAsync();
 
-                System.Diagnostics.Debug.WriteLine("Тестовые данные успешно созданы");
+                System.Diagnostics.Debug.WriteLine("Тестовые данные успешно созданы с новыми полями");
             }
             else
             {
@@ -88,6 +135,13 @@ public class DataService : IDataService
                 var institutionsCount = await _context.Institutions.CountAsync();
 
                 System.Diagnostics.Debug.WriteLine($"Регионов: {regionsCount}, Районов: {districtsCount}, Учреждений: {institutionsCount}");
+
+                // Проверяем данные учреждений
+                var institutions = await _context.Institutions.ToListAsync();
+                foreach (var institution in institutions)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Учреждение: {institution.Name}, TeacherCount: {institution.TeacherCount}, StudentCount: {institution.StudentCount}");
+                }
             }
         }
         catch (Exception ex)

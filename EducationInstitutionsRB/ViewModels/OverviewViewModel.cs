@@ -2,8 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using EducationInstitutionsRB.Models;
 using EducationInstitutionsRB.Services;
-using EducationInstitutionsRB.Views;
-using Microsoft.UI.Xaml;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -23,7 +21,10 @@ public partial class OverviewViewModel : ObservableObject
     private int _totalStudents;
 
     [ObservableProperty]
-    private int _totalStaff;
+    private int _totalTeachers;
+
+    [ObservableProperty]
+    private int _totalStaff; // ВОССТАНАВЛИВАЕМ это свойство
 
     [ObservableProperty]
     private double _successRate = 98.2;
@@ -38,7 +39,8 @@ public partial class OverviewViewModel : ObservableObject
     public string SuccessRateDisplay => $"{SuccessRate:F1}%";
     public string TotalInstitutionsDisplay => TotalInstitutions.ToString("N0");
     public string TotalStudentsDisplay => TotalStudents.ToString("N0");
-    public string TotalStaffDisplay => TotalStaff.ToString("N0");
+    public string TotalTeachersDisplay => TotalTeachers.ToString("N0");
+    public string TotalStaffDisplay => TotalStaff.ToString("N0"); // ВОССТАНАВЛИВАЕМ это свойство
 
     public OverviewViewModel(IDataService dataService)
     {
@@ -58,12 +60,19 @@ public partial class OverviewViewModel : ObservableObject
             var institutions = await _dataService.GetInstitutionsAsync();
             Debug.WriteLine($"Загружено учреждений: {institutions.Count}");
 
+            // ОТЛАДОЧНАЯ ИНФОРМАЦИЯ: выводим данные по каждому учреждению
+            foreach (var institution in institutions)
+            {
+                Debug.WriteLine($"Учреждение: {institution.Name}, Учащихся: {institution.StudentCount}, Преподавателей: {institution.TeacherCount}, Персонала: {institution.StaffCount}");
+            }
+
             // Обновляем статистику
             TotalInstitutions = institutions.Count;
             TotalStudents = institutions.Sum(i => i.StudentCount);
-            TotalStaff = institutions.Sum(i => i.StaffCount);
+            TotalTeachers = institutions.Sum(i => i.TeacherCount);
+            TotalStaff = institutions.Sum(i => i.StaffCount); // ВОССТАНАВЛИВАЕМ подсчет персонала
 
-            Debug.WriteLine($"Статистика: Учреждений={TotalInstitutions}, Учащихся={TotalStudents}, Персонала={TotalStaff}");
+            Debug.WriteLine($"ИТОГО: Учреждений={TotalInstitutions}, Учащихся={TotalStudents}, Преподавателей={TotalTeachers}, Персонала={TotalStaff}");
 
             // Последние добавленные учреждения (последние 3)
             RecentInstitutions = institutions
@@ -76,6 +85,7 @@ public partial class OverviewViewModel : ObservableObject
             // Уведомляем об изменении вычисляемых свойств
             OnPropertyChanged(nameof(TotalInstitutionsDisplay));
             OnPropertyChanged(nameof(TotalStudentsDisplay));
+            OnPropertyChanged(nameof(TotalTeachersDisplay));
             OnPropertyChanged(nameof(TotalStaffDisplay));
             OnPropertyChanged(nameof(SuccessRateDisplay));
         }
@@ -86,69 +96,6 @@ public partial class OverviewViewModel : ObservableObject
         finally
         {
             IsLoading = false;
-        }
-    }
-
-    [RelayCommand]
-    private async Task AddInstitutionAsync()
-    {
-        Debug.WriteLine("Кнопка 'Добавить учреждение' нажата");
-
-        if (App.MainWindow?.Content?.XamlRoot == null)
-        {
-            Debug.WriteLine("XamlRoot не доступен");
-            return;
-        }
-
-        try
-        {
-            var newInstitution = new Institution
-            {
-                RegistrationDate = System.DateTime.Now,
-                Status = "Активно"
-            };
-
-            var dialog = new InstitutionDialog(newInstitution, "Добавить учреждение")
-            {
-                XamlRoot = App.MainWindow.Content.XamlRoot
-            };
-
-            var result = await dialog.ShowAsync();
-
-            if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
-            {
-                Debug.WriteLine("Учреждение добавлено, перезагружаем данные");
-                await LoadDataAsync();
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Debug.WriteLine($"Ошибка при добавлении учреждения: {ex.Message}");
-        }
-    }
-
-    [RelayCommand]
-    private async Task GenerateReportAsync()
-    {
-        Debug.WriteLine("Кнопка 'Создать отчет' нажата");
-
-        if (App.MainWindow?.Content?.XamlRoot == null) return;
-
-        try
-        {
-            var dialog = new Microsoft.UI.Xaml.Controls.ContentDialog
-            {
-                Title = "Генерация отчетов",
-                Content = "Раздел отчетов будет реализован в следующем обновлении",
-                CloseButtonText = "OK",
-                XamlRoot = App.MainWindow.Content.XamlRoot
-            };
-
-            await dialog.ShowAsync();
-        }
-        catch (System.Exception ex)
-        {
-            Debug.WriteLine($"Ошибка при показе диалога отчета: {ex.Message}");
         }
     }
 }

@@ -56,13 +56,13 @@ public sealed partial class OverviewPage : Page
             RecentInstitutionsList.Visibility = Visibility.Collapsed;
             NoDataText.Visibility = Visibility.Collapsed;
 
-            // Загружаем данные
+            // Загружаем данные через ViewModel
             await _viewModel.LoadDataAsync();
 
             // Обновляем UI
             TotalInstitutionsText.Text = _viewModel.TotalInstitutionsDisplay;
             TotalStudentsText.Text = _viewModel.TotalStudentsDisplay;
-            TotalStaffText.Text = _viewModel.TotalStaffDisplay;
+            TotalStaffText.Text = _viewModel.TotalTeachersDisplay;
             SuccessRateText.Text = _viewModel.SuccessRateDisplay;
 
             // Обновляем список недавних учреждений
@@ -89,13 +89,82 @@ public sealed partial class OverviewPage : Page
 
     private async void AddInstitutionButton_Click(object sender, RoutedEventArgs e)
     {
-        await _viewModel.AddInstitutionCommand.ExecuteAsync(null);
-        // После добавления перезагружаем данные
-        await LoadDataAsync();
+        Debug.WriteLine("Кнопка 'Добавить учреждение' нажата на стартовой странице");
+
+        if (App.MainWindow?.Content?.XamlRoot == null)
+        {
+            Debug.WriteLine("XamlRoot не доступен");
+            return;
+        }
+
+        try
+        {
+            var newInstitution = new Institution
+            {
+                RegistrationDate = DateTime.Now,
+                Status = "Активно",
+                InstitutionStatus = "Действующее",
+                OwnershipType = "Государственное",
+                LanguageOfEducation = "Русский",
+                FoundationYear = DateTime.Now.Year
+            };
+
+            var dialog = new ExtendedInstitutionDialog(newInstitution, "Добавить учреждение")
+            {
+                XamlRoot = App.MainWindow.Content.XamlRoot
+            };
+
+            var result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Primary)
+            {
+                try
+                {
+                    await _dataService.AddInstitutionAsync(newInstitution);
+                    Debug.WriteLine("Учреждение добавлено, перезагружаем данные");
+
+                    await LoadDataAsync();
+
+                    var dialogService = App.GetService<DialogService>();
+                    await dialogService.ShowSuccessAsync("Учреждение успешно добавлено!", App.MainWindow.Content.XamlRoot);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Ошибка при добавлении учреждения: {ex.Message}");
+                    var dialogService = App.GetService<DialogService>();
+                    await dialogService.ShowErrorAsync($"Ошибка при добавлении: {ex.Message}", App.MainWindow.Content.XamlRoot);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Ошибка при открытии диалога добавления: {ex.Message}");
+            var dialogService = App.GetService<DialogService>();
+            await dialogService.ShowErrorAsync($"Ошибка: {ex.Message}", App.MainWindow.Content.XamlRoot);
+        }
     }
 
     private async void GenerateReportButton_Click(object sender, RoutedEventArgs e)
     {
-        await _viewModel.GenerateReportCommand.ExecuteAsync(null);
+        Debug.WriteLine("Кнопка 'Создать отчет' нажата");
+
+        if (App.MainWindow?.Content?.XamlRoot == null) return;
+
+        try
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "Генерация отчетов",
+                Content = "Раздел отчетов будет реализован в следующем обновлении",
+                CloseButtonText = "OK",
+                XamlRoot = App.MainWindow.Content.XamlRoot
+            };
+
+            await dialog.ShowAsync();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Ошибка при показе диалога отчета: {ex.Message}");
+        }
     }
 }
