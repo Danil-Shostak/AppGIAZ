@@ -1,8 +1,12 @@
 using EducationInstitutionsRB.Views;
+using Microsoft.UI;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
+using System;
+using WinRT.Interop;
 
 namespace EducationInstitutionsRB;
 
@@ -11,9 +15,17 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         this.InitializeComponent();
-
-        // Устанавливаем Mica материал для современного вида
         this.SystemBackdrop = new Microsoft.UI.Xaml.Media.MicaBackdrop();
+
+        // Разворачиваем на весь экран
+        IntPtr hWnd = WindowNative.GetWindowHandle(this);
+        WindowId windowId = Win32Interop.GetWindowIdFromWindow(hWnd);
+        AppWindow appWindow = AppWindow.GetFromWindowId(windowId);
+
+        if (appWindow.Presenter is OverlappedPresenter presenter)
+        {
+            presenter.Maximize();
+        }
     }
 
     private void RootNavigation_Loaded(object sender, RoutedEventArgs e)
@@ -23,6 +35,7 @@ public sealed partial class MainWindow : Window
         RootNavigation.SelectedItem = RootNavigation.MenuItems[0];
     }
 
+    // Остальной код без изменений...
     private void RootNavigation_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
     {
         if (args.InvokedItemContainer is NavigationViewItem item)

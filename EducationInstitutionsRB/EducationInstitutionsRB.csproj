@@ -59,6 +59,12 @@
     <Page Update="Views\DistrictDialog.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\SplashWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\SplashPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
   <!--
